@@ -1,0 +1,329 @@
+
+body{
+	/*background-image: url(img/background.jpg);*/
+	font-size: 20px;
+    font-family: monospace;
+}
+
+#container{
+	background-color: white;
+	/*opacity: 0.9;*/
+	width: 30%;
+	padding: 50px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 50px;
+	-webkit-box-shadow: 3px 3px 30px 5px rgba(204,204,204,0.9); /*webkit do sfari chroma opery*/
+	-moz-box-shadow: 3px 3px 30px 5px rgba(204,204,204,0.9); /*mozilla*/
+	/*zapobiegawczo do starszych przegladarek*/
+	box-shadow: 3px 3px 30px 5px rgba(204,204,204,0.9);
+}
+
+.article{
+    text-align: center;
+    background-color: white;
+    /*opacity: 0.85;*/
+    width: 75%;
+    padding: 50px;
+	padding-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    -webkit-box-shadow: 3px 3px 30px 5px rgba(204,204,204,0.9); /*webkit do sfari chroma opery*/
+    -moz-box-shadow: 3px 3px 30px 5px rgba(204,204,204,0.9); /*mozilla*/
+    /*zapobiegawczo do starszych przegladarek*/
+    box-shadow: 3px 3px 30px 5px rgba(204,204,204,0.9);
+}
+
+
+.header{
+	width: 100%;
+	padding: 40px 0;
+	color: midnightblue;
+    background-color: lightskyblue;
+	font-size: 50px;
+	text-align: center;
+	font-weight: bold;
+	/*text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;*/
+}
+
+.nav{
+	width: 100%;
+	padding: 10px 0;
+	background-color: midnightblue;
+	text-align: center;
+	border-top: 1px solid #751b1b;
+	border-bottom: 1px solid #751b1b;
+}
+
+h1{
+    font-size: 34px;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+ol{
+	padding: 0;
+	margin: 0; /*wyzerowanie orginalnych marginesow i padingu*/
+	list-style-type: none; /*bez wypunktowania*/
+	font-size: 18px;
+	height: 35px;
+	line-height: 200%;
+	display: inline-block; /*elem blokowe ukladaja sie w linii!*/
+}
+
+ol a{
+	color: white;
+	text-decoration: none; /*brak podkreśleń linkow*/
+	display: block; /*wyswietlanie jak elem blokowe (divy)*/
+	font-size: 20px;
+}
+
+ol > li{ /*rodzic > potomek*/
+	float: left;
+	width: 150px;
+	height: 40px;
+	/*border-right: 1px dashed #751b1b; linia przerywana pomiedzy*/
+}
+
+ol > li:first-child{
+	/*border-left: 1px dashed #751b1b; /*pierwsze z lewej*/
+}
+
+ol > li:hover{
+	background-color: lightskyblue;
+}
+
+ol > li:hover > a{
+	color: midnightblue;
+}
+
+
+
+.sidebar{
+    width: 20%;
+    border-right: 2px solid #ddd;
+    display: inline-block;
+    float: left;
+    overflow-y: scroll;
+    height: 500px;
+    margin-bottom: 10px;
+}
+.mainbar{
+    width: 60%;
+    display: inline-block;
+}
+
+ul.style {
+	margin: 0px;
+	padding: 0px;
+	list-style: none;
+}
+
+ul.style li {
+	display: inline-block;
+	padding: 5px;
+	margin: 10px;
+	line-height: 100%;
+}
+
+ul.style span
+{
+	margin-right: 0.75em;
+}
+
+ul.style a {
+	
+	padding: 10px 20px 10px 20px;
+	letter-spacing: 1px;
+	text-decoration: none;
+	font-weight: bold;
+	color: midnightblue;
+    border-radius: 30px;
+}
+
+ul.style a:hover {
+    background-color: lightskyblue;
+}
+
+
+ul.style .active a {
+    background-color: lightskyblue;
+}
+
+.footer{
+	text-align: center;
+	background-color: lightskyblue;
+	padding: 30px;
+	color: white;
+}
+
+input, select{
+    width: 80%;
+    margin: 10px 20px 10px 20px;
+    font-size: 20px;
+}
+
+input[type=text],
+input[type=number],
+input[type=password]
+{
+    font-family: monospace;
+	background-color: #efefef;
+	color: black;
+    opacity: 1;
+	border: 2px solid #ddd;
+	border-radius: 5px;
+	padding: 10px;
+	box-sizing: border-box;
+	outline: none;
+}
+select
+{
+	padding: 10px; 
+	border-radius: 5px;
+	background-color: #efefef;
+	border: 2px solid #ddd;
+	box-sizing: border-box;
+	outline: none;
+}
+select > option:hover
+{
+	background-color: #c34f4f;
+}
+
+input[type=text]:focus,
+input[type=number]:focus,
+input[type=password]:focus,
+select:focus
+{
+	-webkit-box-shadow: 0px 0px 10px 2px rgba(204,204,204,0.9); 
+	-moz-box-shadow: 0px 0px 10px 2px rgba(204,204,204,0.9);
+	box-shadow: 0px 0px 10px 2px rgba(204,204,204,0.9);
+	border: 2px solid midnightblue;
+	color: midnightblue;
+}
+input[type=number]:placeholder,
+input[type=text]:placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: black;
+  opacity: 1; /* Firefox */
+}
+input[type=text]:focus::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: black;
+  opacity: 0.7; /* Firefox */
+}
+input[type=submit]
+{
+	background-color: white;
+    font-family: monospace;
+	color: midnightblue;
+	padding: 15px 5px;
+	border: 3px solid midnightblue;
+	border-radius: 30px;
+	cursor: pointer;
+	letter-spacing: 2px; 
+}
+
+input[type=submit]:hover
+{
+    color: white;
+	background-color: midnightblue;
+}
+
+input[type=submit]:focus
+{
+	-webkit-box-shadow: 0px 0px 15px 5px rgba(204,204,204,0.9); 
+	-moz-box-shadow: 0px 0px 15px 5px rgba(204,204,204,0.9);
+	box-shadow: 0px 0px 15px 5px rgba(204,204,204,0.9);
+}
+
+th, td
+{
+    margin: 5px;
+    padding: 5px 30px
+}
+table
+{
+    margin: 10px auto 20px auto;
+    padding: 10px 30px;
+    font-size: 20px;
+}
+
+
+
+@media screen and (max-width: 768px) {
+  /* For mobile phones: */ 
+    body{
+        font-size: 16px;
+    }
+    .header{
+        font-size: 40px;
+        padding: 20px 0px;
+    }
+    .article{
+        width: 100%;
+        padding: 10px 0px 20px 0px;
+        margin: 0px;
+    }
+    #container{
+	   width: 60%;
+        margin-top: 20px;
+    }
+    ol > li{ /*rodzic > potomek*/
+        width: 100px;
+    }
+	.footer
+	{
+		padding: 20px;
+	}
+    table, th, td
+    {
+        margin: 0px 5px;
+        padding: 10px;
+        font-size: 16px;
+    }
+    input, select{
+        font-size: 16px;
+        width: 100%;
+        margin: 10px;
+    }
+    select{
+        width: 100%;
+    }
+    input{
+        width: 90%;
+    }
+    h1{
+        font-size: 24px;
+    }
+    
+    .sidebar{
+        width: 30%;
+        height: 500px;
+    }
+    .mainbar{
+        width: 69%;
+    }
+
+    ul.style {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    ul.style li {
+        padding: 10px 0px;
+        margin: 5px;
+        line-height: 100%;
+    }
+
+    ul.style span
+    {
+        margin-right: 0.2em;
+    }
+
+    ul.style a {
+
+        padding: 10px;
+        letter-spacing: 0.5px;
+        border-radius: 30px;
+    }
+}
