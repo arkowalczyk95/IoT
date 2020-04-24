@@ -122,20 +122,7 @@
                      value="<?php echo $mode_params["light_frequency"]; ?>" oninput="lightOutputId.value = lightInputId.value" required="required"
                      style="background-image: linear-gradient(to right, lightskyblue, white, gold)">
               <output name="lightOutputName" id="lightOutputId"><?php echo $mode_params["light_frequency"]; ?></output>
-              
-            <!--<select <?php echo $edit; ?> name="light_frequency">
-            <option selected value="<?php echo $mode_params["light_frequency"]; ?>"><?php echo $mode_params["light_frequency"]; ?></option>
-            <option value="0-3000">0-3000</option>
-            <option value="3000-6000">3000-6000</option>
-            <option value="6000-9000">6000-9000</option>
-            <option value="9000-12000">9000-12000</option>
-            <option value="12000-15000">12000-15000</option>
-            <option value="15000-18000">15000-18000</option>
-            <option value="18000-21000">18000-21000</option>
-            <option value="21000-24000">21000-24000</option>
-            <option value="24000-27000">24000-27000</option>
-            <option value="27000-30000">27000-30000</option>
-            </select>-->
+
           </td>
 	  </tr>
           
@@ -175,8 +162,8 @@
         
         <?php
         
-	if (isset($_POST['save_mode'])) {   // do zmiany na update przez api/modes/update
-        $url = 'localhost:8080/api';  // dodanie modu przez api/modes/create
+	if (isset($_POST['save_mode'])) { 
+        $url = 'localhost:8080/api';
         $collection_name = 'modes/update';
         $request_url = $url . '/' . $collection_name;
         //$new_mode_name = trim(str_replace(' ', '_', $_POST['current_mode'])) ? trim(str_replace(' ', '_', $_POST['current_mode'])) : $mode_name;
@@ -194,19 +181,6 @@
                 'humidity' => trim($_POST['humidity']), 
                 'lightFrequency' => trim($_POST['light_frequency'])
             );
-            
-        }else{
-            /*$new_data = array($new_mode_name, trim($_POST['temperature']), trim($_POST['humidity']), trim($_POST['light_frequency']), $mode_params["mode_id"]);
-            $res1 = pg_query_params($conn, "UPDATE room_modes set name = $1, temperature = $2, humidity = $3, light_frequency = $4 where mode_id = $5", $new_data);*/
-            
-            $data = array(
-                'modeId' => $mode_params["mode_id"],
-                'name' => $mode_name, 
-                'temperature' => trim($_POST['temperature']), 
-                'humidity' => trim($_POST['humidity']), 
-                'lightFrequency' => trim($_POST['light_frequency'])
-            );
-        }
         
             $curl = curl_init($request_url);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -219,7 +193,7 @@
             $response = curl_exec($curl);
             curl_close($curl);
             echo $response . PHP_EOL;
-            $url = "modes.php?login=$login&mode=$new_mode_name";
+            $url = "modes.php?login=$login&mode=$mode_name";
             echo "<script type='text/javascript'> document.location = '$url'; </script>";
             exit();
         
@@ -250,7 +224,6 @@
         echo "<script type='text/javascript'> document.location = '$url'; </script>";
         exit();
         }
-	
 	
         ?>
         

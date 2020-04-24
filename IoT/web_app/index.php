@@ -21,8 +21,7 @@
 	</ol>
     </div>
 
-    <div class="article">
-	<!--<h1 align="center">LOGIN</h1> -->     
+    <div class="article">   
         
     <div id="container">
 	<form method="POST" action="">		

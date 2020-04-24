@@ -2,9 +2,7 @@
     require 'connection.php';
     require 'db_helper.php';
     $conn = connection();
-
     $login = trim($_GET['login']);
-
 ?>
 
 
@@ -59,18 +57,6 @@
                      oninput="lightOutputId.value = lightInputId.value" required="required"
                      style="background-image: linear-gradient(to right, lightskyblue, white, gold)">
               <output name="lightOutputName" id="lightOutputId"><p> </p></output>
-            <!--<select name="light_frequency">
-            <option value="0-3000">0-3000</option>
-            <option value="3000-6000">3000-6000</option>
-            <option value="6000-9000">6000-9000</option>
-            <option value="9000-12000">9000-12000</option>
-            <option value="12000-15000">12000-15000</option>
-            <option value="15000-18000">15000-18000</option>
-            <option value="18000-21000">18000-21000</option>
-            <option value="21000-24000">21000-24000</option>
-            <option value="24000-27000">24000-27000</option>
-            <option value="27000-30000">27000-30000</option>
-            </select>-->
           </td>
 	  </tr>
           

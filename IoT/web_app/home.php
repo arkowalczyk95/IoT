@@ -4,10 +4,9 @@
     require 'api_helper.php';
     $conn = connection();
     $url = 'localhost:8080/api';
-
     $login = trim($_GET['login']);
-/*
-    $measures = pg_query($conn, "SELECT * FROM esp_reads where read_id=(select max(read_id) from esp_reads);");
+
+    /*$measures = pg_query($conn, "SELECT * FROM esp_reads where read_id=(select max(read_id) from esp_reads);");  // odczytanie danych przez baze
     while ($row = pg_fetch_row($measures)) {
         $current_humidity = $row[1];
         $current_light_frequency = $row[2];
@@ -17,7 +16,7 @@
         $current_uv_index = $row[6];
     }*/
 
-    $collection_name = 'espRead/recent';  // tak można odczytać obecne ustawienia przez RestAPI ale to nie zwraca read_id
+    $collection_name = 'espRead/recent';  // odczytanie danych przez API
     $request_url = $url . '/' . $collection_name;
     $curl = curl_init($request_url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -37,27 +36,11 @@
     $current_temperature_sht = $measures["temperatureSht"];
     $current_uv_index = $measures["uvIndex"];
 
-    /*$read_ids = array();
-    foreach ($measures as $row){
-        array_push($read_ids, $row["readId"]);
-    }
-    echo max($read_ids);
-    foreach ($measures as $row){
-        if ($row["readId"] == max($read_ids)){ 
-            $current_humidity = $row["humidity"];
-            $current_light_frequency = $row["lightFrequency"];
-            $current_pressure = $row["pressure"];
-            $current_temperature_bmp = $row["temperatureBmp"];
-            $current_temperature_sht = $row["temperatureSht"];
-            $current_uv_index = $row["uvIndex"];
-        }
-    }*/
-
 //    $active_mode_params = get_active_mode_params($conn);  // pobiera z bazy - stary sposob
     $active_mode_params = api_get_active_mode_params();  // pobiera z API
     $modes = get_all_accesible_modes($conn, $login);
 
-    // do zmiany na update przez api/modes/update
+    // wybranie trybu przez API
 	if (isset($_POST['change_mode'])) {
 
         $url = 'localhost:8080/api';
@@ -78,26 +61,25 @@
         echo $response . PHP_EOL;
 
         header("Refresh:0");
+    }
+        // wybranie trybu przez baze
+        /* $res1 = pg_query_params($conn, "UPDATE room_modes set selected = false where upper(name) = upper($1)", array($active_mode_params["name"]));
 
-}
-
-//         $res1 = pg_query_params($conn, "UPDATE room_modes set selected = false where upper(name) = upper($1)", array($active_mode_params["name"]));
-//
-//         if ($res1) {
-//             $res2 = pg_query_params($conn, "UPDATE room_modes set selected = true where upper(name) = upper($1)", array($new_mode_name));
-//             if ($res2) {
-//                 header("Refresh:0");
-//             }
-//             else{
-//                 pg_query_params($conn, "UPDATE room_modes set selected = true where upper(name) = upper($1)", array($active_mode_params["name"]));
-//                 echo "Change of mode unsucessful";
-//                 echo pg_last_error($conn);
-//             }
-//         }else{
-//             echo "Change mode unsucessful";
-//             echo pg_last_error($conn);
-//         }
-//     }
+         if ($res1) {
+             $res2 = pg_query_params($conn, "UPDATE room_modes set selected = true where upper(name) = upper($1)", array($new_mode_name));
+             if ($res2) {
+                 header("Refresh:0");
+             }
+             else{
+                 pg_query_params($conn, "UPDATE room_modes set selected = true where upper(name) = upper($1)", array($active_mode_params["name"]));
+                 echo "Change of mode unsucessful";
+                 echo pg_last_error($conn);
+             }
+         }else{
+             echo "Change mode unsucessful";
+             echo pg_last_error($conn);
+         }*/
+     
 ?>
 
 <!DOCTYPE HTML>
