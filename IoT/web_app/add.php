@@ -36,34 +36,48 @@
       <thead>
       <tr align="center">
           <th>Name</th>
-          <th><input type="text" name="mode_name"></th>
+          <th><input type="text" name="mode_name" required="required"></th>
 	  </tr>
       </thead>
         
       <tbody>
           
       <tr align="center">
-          <td>Temperature</td>
+          <td>Temperature [°C]<br/>(16°C to 26°C)</td>
           <td>
-              <input type="number" name="temperature" min="16" max="26">
+              <input type="range" name="temperature" id="tempInputId" min="16" max="26"
+                     oninput="tempOutputId.value = tempInputId.value" required="required"
+                     style="background-image: linear-gradient(to right, dodgerblue, gold, orangered)">
+              <output name="tempOutputName" id="tempOutputId"><p> </p></output>
           </td>
 	  </tr>
           
       <tr align="center">
-          <td>Light color</td>
+          <td>Light intensity<br/>(1 to 10)</td>
           <td>    
-            <select name="light_color">
-            <option value="cold">cold</option>
-            <option value="neutral">neutral</option>
-            <option value="warm">warm</option>
-            </select>
+              <input type="range" name="light_frequency" id="lightInputId" min="1" max="10"
+                     oninput="lightOutputId.value = lightInputId.value" required="required"
+                     style="background-image: linear-gradient(to right, lightskyblue, white, gold)">
+              <output name="lightOutputName" id="lightOutputId"><p> </p></output>
+            <!--<select name="light_frequency">
+            <option value="0-3000">0-3000</option>
+            <option value="3000-6000">3000-6000</option>
+            <option value="6000-9000">6000-9000</option>
+            <option value="9000-12000">9000-12000</option>
+            <option value="12000-15000">12000-15000</option>
+            <option value="15000-18000">15000-18000</option>
+            <option value="18000-21000">18000-21000</option>
+            <option value="21000-24000">21000-24000</option>
+            <option value="24000-27000">24000-27000</option>
+            <option value="27000-30000">27000-30000</option>
+            </select>-->
           </td>
 	  </tr>
           
       <tr align="center">
-          <td>Humidity [%]</td>
+          <td>Humidity [%]<br/>(10% to 90%)</td>
          <td>    
-          <input type="number" name="humidity" min="10" max="90">
+          <input type="number" name="humidity" min="10" max="90" required="required">
           </td>
 	  </tr>
           
@@ -85,16 +99,44 @@
     <?php 
             
 	if (isset($_POST['add_mode'])) {
-        $mode_name = trim($_POST['mode_name']);
-        $id_public = (trim($_POST['public']) == 'on') ? 'true' : 'false';
-        $new_data = array($mode_name, $login, 'false', $id_public, trim($_POST['temperature']), trim($_POST['humidity']), '100', '1');
+        $mode_name = trim(str_replace(' ', '_', $_POST['mode_name']));
+        $is_public = (trim($_POST['public']) == 'on') ? 'true' : 'false';
+        /*$new_data = array($mode_name, $login, 'false', $is_public, trim($_POST['temperature']), trim($_POST['humidity']), '100', '1');  // dodanie modu tylko do bazy
         $res1 = pg_query_params($conn, "INSERT INTO room_modes (name, owner, selected, is_public, temperature, humidity, light_frequency, uv_index) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)", $new_data);
         if ($res1) {
             echo "Mode '$mode_name' added";
         }else{
             echo "Add mode unsucessful:\n";
             echo pg_last_error($conn);
-        }
+        }*/
+
+        $url = 'localhost:8080/api';  // dodanie modu przez api/modes/create
+        $collection_name = 'modes/create';
+        $request_url = $url . '/' . $collection_name;
+        $data = array(
+            'name' => $mode_name, 
+            'owner' => $login, 
+            'selected' => false,
+            'isPublic' => $is_public, 
+            'temperature' => trim($_POST['temperature']), 
+            'humidity' => trim($_POST['humidity']), 
+            'lightFrequency' => trim($_POST['light_frequency'])
+        );
+        $curl = curl_init($request_url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS,  json_encode($data));
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
+          'Accept: application/json',
+          'Content-Type: application/json'
+        ]);
+        $response = json_decode(curl_exec($curl), true);
+        if (isset($response["name"]))
+            echo 'Mode ' . $response["name"] . ' added';
+        else
+            echo 'Error occured ' . curl_strerror($curl);
+        curl_close($curl);
+        
     }
     ?>
         

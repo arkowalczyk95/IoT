@@ -1,85 +1,112 @@
-
 <?php
     require 'connection.php';
     require 'db_helper.php';
+    require 'api_helper.php';
     $conn = connection();
+    $url = 'localhost:8080/api';
 
     $login = trim($_GET['login']);
-
+/*
     $measures = pg_query($conn, "SELECT * FROM esp_reads where read_id=(select max(read_id) from esp_reads);");
     while ($row = pg_fetch_row($measures)) {
-      /*echo "\nread_id: $row[0] humidity: $row[1] light_frequency: $row[2] pressure: $row[3] temperature_bmp: $row[4] temperature_sht: $row[5] uv_index: $row[6]";
-      echo "<br />\n";*/
         $current_humidity = $row[1];
         $current_light_frequency = $row[2];
         $current_pressure = $row[3];
         $current_temperature_bmp = $row[4];
         $current_temperature_sht = $row[5];
         $current_uv_index = $row[6];
-    }
+    }*/
 
-    $active_mode_params = get_active_mode_params($conn);
-    $modes = get_all_accesible_modes($conn, $login);
-    
-	if (isset($_POST['change_mode'])) {
-        $new_mode_name = trim($_POST['current_mode']);
-        $res1 = pg_query_params($conn, "UPDATE room_modes set selected = false where upper(name) = upper($1)", array($active_mode_params["name"]));
-        if ($res1) {
-            $res2 = pg_query_params($conn, "UPDATE room_modes set selected = true where upper(name) = upper($1)", array($new_mode_name));
-            if ($res2) {
-                header("Refresh:0");
-            }
-            else{
-                pg_query_params($conn, "UPDATE room_modes set selected = true where upper(name) = upper($1)", array($active_mode_params["name"]));
-                echo "Change of mode unsucessful";
-                echo pg_last_error($conn);
-            }
-        }else{
-            echo "Change mode unsucessful";
-            echo pg_last_error($conn);
+    $collection_name = 'espRead/recent';  // tak można odczytać obecne ustawienia przez RestAPI ale to nie zwraca read_id
+    $request_url = $url . '/' . $collection_name;
+    $curl = curl_init($request_url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, [
+      'Accept: application/json',
+      'Content-Type: application/json'
+    ]);
+    $response = curl_exec($curl);
+    curl_close($curl);
+    //echo $response . PHP_EOL;
+    $measures = json_decode($response, true);
+
+    $current_humidity = $measures["humidity"];
+    $current_light_frequency = $measures["lightFrequency"];
+    $current_pressure = $measures["pressure"];
+    $current_temperature_bmp = $measures["temperatureBmp"];
+    $current_temperature_sht = $measures["temperatureSht"];
+    $current_uv_index = $measures["uvIndex"];
+
+    /*$read_ids = array();
+    foreach ($measures as $row){
+        array_push($read_ids, $row["readId"]);
+    }
+    echo max($read_ids);
+    foreach ($measures as $row){
+        if ($row["readId"] == max($read_ids)){ 
+            $current_humidity = $row["humidity"];
+            $current_light_frequency = $row["lightFrequency"];
+            $current_pressure = $row["pressure"];
+            $current_temperature_bmp = $row["temperatureBmp"];
+            $current_temperature_sht = $row["temperatureSht"];
+            $current_uv_index = $row["uvIndex"];
         }
-        /*$oldTitle = $title;
-        $oldAuthor =  $author;
-        $oldCategory = $category;
-        $oldYear = $year;
-		$title = trim($_POST['title']);
-		$author = trim($_POST['author']);
-		$category = trim($_POST['category']);
-		$year = trim($_POST['year']);
-        
-        $edited = false;
-		if (!isset($title) || empty($title)) $title = $oldTitle;
-        else $edited = true;
-        if (!isset($author) || empty($author)) $author = $oldAuthor;
-        else $edited = true;
-        if (!isset($category) || empty($category)) $category = $oldCategory;
-        else $edited = true;
-        if (!isset($year) || empty($year)) $year = $oldYear;
-        else $edited = true;
+    }*/
 
-        if ($edited) {   	
-            $query = 'UPDATE ksiazki SET tytul=:title, autor=:author, kategoria=:category, rok_wydania=:year WHERE id=:editId';
-            if ($sth = $pdo->prepare($query)) {
-                $sth->bindValue(':title', $title, PDO::PARAM_STR);
-                $sth->bindValue(':author', $author, PDO::PARAM_STR);
-                $sth->bindValue(':category', $category, PDO::PARAM_STR);
-                $sth->bindValue(':year', $year, PDO::PARAM_INT);
-                $sth->bindValue(':editId', $editId, PDO::PARAM_INT);   
-                $sth->execute();
-                $pdo->commit();
-                $ok = true;
-            }
-            <?php echo (isset($result))?$result:'';?>
-        }*/
-    }
+//    $active_mode_params = get_active_mode_params($conn);  // pobiera z bazy - stary sposob
+    $active_mode_params = api_get_active_mode_params();  // pobiera z API
+    $modes = get_all_accesible_modes($conn, $login);
+
+    // do zmiany na update przez api/modes/update
+	if (isset($_POST['change_mode'])) {
+
+        $url = 'localhost:8080/api';
+        $collection_name = 'modesName';
+        $new_mode_name = trim(str_replace(' ', '_', $_POST['current_mode']));
+        $request_url = $url . '/' . $collection_name . '/' . $new_mode_name;
+
+        echo $request_url;
+
+        $curl = curl_init($request_url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
+          'Accept: application/json',
+          'Content-Type: application/json'
+        ]);
+        $response = curl_exec($curl);
+        curl_close($curl);
+        echo $response . PHP_EOL;
+
+        header("Refresh:0");
+
+}
+
+//         $res1 = pg_query_params($conn, "UPDATE room_modes set selected = false where upper(name) = upper($1)", array($active_mode_params["name"]));
+//
+//         if ($res1) {
+//             $res2 = pg_query_params($conn, "UPDATE room_modes set selected = true where upper(name) = upper($1)", array($new_mode_name));
+//             if ($res2) {
+//                 header("Refresh:0");
+//             }
+//             else{
+//                 pg_query_params($conn, "UPDATE room_modes set selected = true where upper(name) = upper($1)", array($active_mode_params["name"]));
+//                 echo "Change of mode unsucessful";
+//                 echo pg_last_error($conn);
+//             }
+//         }else{
+//             echo "Change mode unsucessful";
+//             echo pg_last_error($conn);
+//         }
+//     }
 ?>
 
 <!DOCTYPE HTML>
 <html lang="pl">
 <head>
+    <script src="https://code.jquery.com/jquery-1.7.2.js"></script>
     <meta charset="utf-8"/>
     <link rel="STYLESHEET" type="text/css" href="style.css" />
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <title>SmartRoom</title>
 </head>
 <body>
@@ -100,13 +127,13 @@
       <thead>
       <tr align="center">
           <th>Mode</th>
-        <form method="POST" action="" >	
-          <th>    
+        <form method="POST" action="" >
+          <th>
             <select name="current_mode">
-            <?php if (isset($modes)): ?> 
+            <?php if (isset($modes)): ?>
             <?php foreach ($modes as $row): ?>
             <option <?php if ($active_mode_params["name"] == $row["name"]) { ?> selected <?php }?>
-                    value="<?php echo $row["name"]; ?>"><?php echo $row["name"]; ?></option>
+                    value="<?php echo $row["name"]; ?>"><?php echo str_replace('_', ' ', $row["name"]); ?></option>
             <?php endforeach; ?>
             <?php endif; ?>
             </select>
@@ -116,49 +143,88 @@
 	  </tr>
       </thead>
     </table>
-        
+
     <table class="table" align="center">
         <thead>
-        <th></th>
-        <th>Current</th>
-            <th>Settings</th>
+        <th colspan="2">Current measures</th>
         </thead>
       <tbody>
       <tr align="center">
-          <td>Temperature</td>
-          <td><?php echo $current_temperature_bmp; ?></td>
-          <td>
-              <input type="number" name="temperature" min="16" max="26" value="<?php echo $active_mode_params["temperature"]; ?>">
-          </td>
+          <td style="padding: 30px 50px 0px 0px ">Temperature [°C]</td>
+          <td style="padding: 30px 10px 0px 50px"><?php echo $current_temperature_bmp; ?></td>
 	  </tr>
       <tr align="center">
-          <td>Light color</td>
-          <td>neutral</td>
-          <td>    
-            <select name="light_color">
-            <option value="cold">cold</option>
-            <option selected value="neutral">neutral</option>
-            <option value="warm">warm</option>
-            </select>
-          </td>
+          <td style="padding: 30px 50px 0px 0px">Light intensity<br/>(1 to 10)</td>
+          <td style="padding: 30px 10px 0px 50px"><?php echo $current_light_frequency; ?></td>
 	  </tr>
       <tr align="center">
-          <td>Humidity [%]</td>
-          <td><?php echo $current_humidity; ?></td>
-         <td>    
-          <input type="number" name="humidity"min="10" max="90" value="<?php echo $active_mode_params["humidity"]; ?>">
-          </td>
+          <td style="padding: 30px 50px 0px 0px">Humidity [%]</td>
+          <td style="padding: 30px 10px 0px 50px"><?php echo $current_humidity; ?></td>
 	  </tr>
-          <tr align="center">
-          <td colspan="3"><input type="submit" name="change_settings" value="Change settings"></td>
+      <tr align="center">
+          <td style="padding: 30px 50px 0px 0px">Pressure [hPa]</td>
+          <td style="padding: 30px 10px 0px 50px"><?php echo $current_pressure; ?></td>
+          </tr>
+      <tr align="center" >
+          <td style="padding: 20px 50px 0px 0px">UV index</td>
+          <td style="padding: 20px 10px 0px 50px"><p data-color="<?php echo $current_uv_index; ?>" ><?php echo $current_uv_index; ?></p></td>
           </tr>
       </tbody>
     </table>
-        
+
     </div>
 
     <div class="footer">
     </div>
 
+<script>
+$(document).ready(function(){
+
+  var mc = {
+    '0-2'     : 'green',
+    '3-5'    : 'yellow',
+    '6-7'   : 'orange',
+    '8-10'  : 'red',
+    '11-20' : 'purple'
+  };
+
+function between(x, min, max) {
+  return x >= min && x <= max;
+}
+
+
+
+  var dc;
+  var first;
+  var second;
+  var th;
+
+  $('p').each(function(index){
+
+    th = $(this);
+
+    dc = parseInt($(this).attr('data-color'),10);
+
+
+      $.each(mc, function(name, value){
+
+
+        first = parseInt(name.split('-')[0],10);
+        second = parseInt(name.split('-')[1],10);
+
+        console.log(between(dc, first, second));
+
+        if( between(dc, first, second) ){
+          th.addClass(value);
+        }
+
+
+
+      });
+
+  });
+});
+</script>
+<script src="./script.js"></script>
 </body>
 </html>

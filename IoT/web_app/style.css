@@ -1,8 +1,33 @@
-
+html{
+  position:relative; 
+  min-height: 100%;
+}
 body{
-	/*background-image: url(img/background.jpg);*/
+	/*ba:q
+
+ckground-image: url(img/background.jpg);*/
 	font-size: 20px;
     font-family: monospace;
+}
+
+.red{
+    color: red;
+}
+
+.orange{
+    color: orange;
+}
+
+.green{
+    color: green;
+} 
+
+.yellow{
+    color: yellow;
+}
+
+.purple{
+    color: purple;
 }
 
 #container{
@@ -101,11 +126,11 @@ ol > li:hover > a{
 
 .sidebar{
     width: 20%;
+    height: 600px;
     border-right: 2px solid #ddd;
     display: inline-block;
     float: left;
     overflow-y: scroll;
-    height: 500px;
     margin-bottom: 10px;
 }
 .mainbar{
@@ -155,6 +180,10 @@ ul.style .active a {
 	background-color: lightskyblue;
 	padding: 30px;
 	color: white;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
 }
 
 input, select{
@@ -177,6 +206,37 @@ input[type=password]
 	box-sizing: border-box;
 	outline: none;
 }
+
+input[type=range]
+{
+  -webkit-appearance: none;
+  width: 80%;
+  height: 15px;
+  border-radius: 5px;  
+  background: #d3d3d3;
+  outline: none;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+  
+    
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%; 
+  background: midnightblue;
+  cursor: pointer;
+}
+input[type=range]::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: midnightblue;
+  cursor: pointer;
+}
+
 select
 {
 	padding: 10px; 
@@ -216,7 +276,7 @@ input[type=submit]
 	background-color: white;
     font-family: monospace;
 	color: midnightblue;
-	padding: 15px 5px;
+	padding: 15px 15px;
 	border: 3px solid midnightblue;
 	border-radius: 30px;
 	cursor: pointer;
@@ -280,6 +340,10 @@ table
         margin: 0px 5px;
         padding: 10px;
         font-size: 16px;
+        align-content: center;
+    }
+    th, td{
+        display: inline-table;
     }
     input, select{
         font-size: 16px;
@@ -298,7 +362,6 @@ table
     
     .sidebar{
         width: 30%;
-        height: 500px;
     }
     .mainbar{
         width: 69%;
@@ -327,3 +390,4 @@ table
         border-radius: 30px;
     }
 }
+
