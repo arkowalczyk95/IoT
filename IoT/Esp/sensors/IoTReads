@@ -1,0 +1,103 @@
+#include <ESP8266WiFi.h>
+#include <ArduinoJson.h>
+#include <Wire.h>
+#include <Adafruit_BMP085.h>
+#include <SHT21.h>
+#include <VEML6075.h>
+#include <TSL235R.h>
+#include <ESP8266HTTPClient.h>
+Adafruit_BMP085 bmp;
+VEML6075 veml6075 = VEML6075();
+SHT21 SHT21;
+const char SENSOR_PIN = 4;
+TSL235R sensor(SENSOR_PIN, PULSE_MODE);
+
+void setup()
+{
+  Serial.begin(115200);
+  Wire.begin(12, 14);
+    if (!bmp.begin())
+  {
+    Serial.println("Could not find BMP180 or BMP085 sensor at 0x77");
+    while (1) {}
+  }
+  SHT21.begin();
+  veml6075.begin();
+
+  //wifi connection
+  String ssid = "";
+  String password = "";
+  WiFi.mode(WIFI_STA); // wifi client
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP()); // pokazuje adres IP ESP, który się podłącza do danej sieci
+
+
+
+  }
+
+
+void loop()
+{
+  veml6075.poll();
+
+ // Serial.print("BMP180 Temperature(C): ");
+  float temperatureBmp = bmp.readTemperature();
+//  Serial.println(temperatureBmp);
+  Serial.print("BMP180 Pressure (hPa): ");
+  float pressure = bmp.readPressure()/100;
+//  Serial.println(pressure);
+//  Serial.print("SHT21 Humidity(%RH): ");
+  float humidity = SHT21.getHumidity();
+//  Serial.println(humidity);
+//  Serial.print("SHT21 Temperature(C): ");
+  float temperatureSht = SHT21.getTemperature();
+//  Serial.println(temperatureSht);
+//  Serial.print(("VEML6075 UV Index: "));
+  float uvIndex = veml6075.getUVIndex();
+//  Serial.println(uvIndex);
+//  Serial.print("TSL235R Light frequency(Hz): ");
+  float lightFrequency = sensor.read();
+ // Serial.println(sensor.read());
+
+ // DynamicJsonDocument doc(1024);
+ // String input = "{\"temperatureSht\":temperatureSht,\"temperatureBmp\":temperatureBmp,\"uvIndex\":uvIndex,\"humidity\":humidity, \"pressure\":pressure, \"lightFrequency\":lightFrequency}";
+ // deserializeJson(doc, input);
+
+  StaticJsonBuffer<300> JSONbuffer;
+  JsonObject& JSONencoder = JSONbuffer.createObject();
+  JSONencoder["temperatureSht"] = temperatureSht;
+  JSONencoder["temperatureBmp"] = temperatureBmp;
+  JSONencoder["pressure"] = pressure;
+  JSONencoder["humidity"] = humidity;
+  JSONencoder["uvIndex"] = uvIndex;
+  JSONencoder["lightFrequency"] = lightFrequency;
+
+  char JSONmessageBuffer[300];
+  JSONencoder.prettyPrintTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
+  Serial.println(JSONmessageBuffer);
+
+
+  HTTPClient http;
+  String endpoint = "http://ip_address:port/api/espRead";
+  http.begin("http://ip_address:port/api/espRead");
+  http.addHeader("Content-Type", "application/json");
+  Serial.println("Send Request to: ");
+  Serial.println(endpoint);
+  int httpCode = http.POST(JSONmessageBuffer);
+  String payload = http.getString();
+  Serial.println("Response from server");
+  Serial.println(httpCode);
+  Serial.println(payload);
+  http.end();
+
+  Serial.println();
+  delay(5000);
+}

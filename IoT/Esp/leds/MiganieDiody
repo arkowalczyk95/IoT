@@ -1,0 +1,187 @@
+#include <ESP8266WebServer.h>
+#include <ESP8266WiFi.h>
+#include <ArduinoJson.h>
+
+ESP8266WebServer server;
+
+/*
+ * DIODA1
+ * RED D8 GPIO15
+ * BLUE D7 GPIO13
+ * GREEN D6 GPIO12
+ *
+ * DIODA2
+ * RED D5 GPIO14
+ * BLUE D4 GPIO2
+ * GREEN D3 GPIO0
+ *
+ * DIODA3
+ * RED D2 GPIO04
+ * BLUE D1 GPIO5
+ * GREEN D0 GPIO16
+ *
+*/
+// LED1
+const int l1RED = 15;
+const int l1GREEN = 12;
+const int l1BLUE = 13;
+// LED2
+const int l2RED = 14;
+const int l2GREEN = 0;
+const int l2BLUE = 2;
+
+//LED3
+const int l3RED = 4;
+const int l3GREEN = 16;
+const int l3BLUE = 5;
+
+void setup() {
+   Serial.begin(115200);
+  String ssid = "";
+  String password = "";
+
+   Serial.println();
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+
+  WiFi.mode(WIFI_STA); // wifi client
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP()); // pokazuje adres IP ESP, który się podłącza do danej sieci
+
+  pinMode(l1RED, OUTPUT);
+  pinMode(l1GREEN, OUTPUT);
+  pinMode(l1BLUE, OUTPUT);
+
+  pinMode(l2RED, OUTPUT);
+  pinMode(l2GREEN, OUTPUT);
+  pinMode(l2BLUE, OUTPUT);
+
+  pinMode(l3RED, OUTPUT);
+  pinMode(l3GREEN, OUTPUT);
+  pinMode(l3BLUE, OUTPUT);
+
+
+  analogWrite(l1RED, 100);
+  analogWrite(l1GREEN, 0);
+  analogWrite(l1BLUE, 0);
+  analogWrite(l2RED, 100);
+  analogWrite(l2GREEN, 0);
+  analogWrite(l2BLUE, 0);
+  analogWrite(l3RED, 100);
+  analogWrite(l3GREEN, 0);
+  analogWrite(l3BLUE, 0);
+
+  server.on("/",[](){server.send(200,"text/plain","Hello World!");});
+  server.on("/temperature", HTTP_OPTIONS, displayDataOptions);
+  server.on("/temperature", HTTP_POST, handleTemperature);
+  server.on("/humidity", HTTP_OPTIONS, displayDataOptions);
+  server.on("/humidity", HTTP_POST, handleHumidity);
+  server.on("/light", HTTP_OPTIONS, displayDataOptions);
+  server.on("/light", HTTP_POST, handleLight);
+  server.begin();
+}
+
+void loop() {
+ server.handleClient();
+}
+
+
+
+void displayDataOptions()
+{
+  server.sendHeader("Connection", "close");
+  server.sendHeader("Access-Control-Allow-Origin","*"); //to access ESP from another device
+  server.send(204,"");
+}
+
+void handleTemperature()
+{
+  String data = server.arg("plain");
+  StaticJsonBuffer<200> jBuffer;
+  JsonObject& jObject = jBuffer.parseObject(data);
+  String msg = jObject["action"];
+  Serial.println(msg);
+    if(msg.equals("increase")){
+  Serial.println("increase temperature");
+  analogWrite(l1RED, 200);
+  analogWrite(l1GREEN, 0);
+  analogWrite(l1BLUE, 0);
+  }
+  else if(msg.equals("decrease")){
+  Serial.println("decrease temperature");
+  analogWrite(l1RED, 0);
+  analogWrite(l1GREEN, 200);
+  analogWrite(l1BLUE, 0);
+  }else
+  {
+  Serial.println("do nothing with temperature");
+  analogWrite(l1RED, 0);
+  analogWrite(l1GREEN, 0);
+  analogWrite(l1BLUE, 0);
+  }
+  server.send(204,"temperature");
+}
+void handleHumidity()
+{
+  String data = server.arg("plain");
+  StaticJsonBuffer<200> jBuffer;
+  JsonObject& jObject = jBuffer.parseObject(data);
+  String msg = jObject["action"];
+  Serial.println(msg);
+    if(msg.equals("increase")){
+  Serial.println("increase humidity");
+  analogWrite(l2RED, 200);
+  analogWrite(l2GREEN, 0);
+  analogWrite(l2BLUE, 0);
+  }
+  else if(msg.equals("decrease")){
+  Serial.println("decrease humidity");
+  analogWrite(l2RED, 0);
+  analogWrite(l2GREEN, 200);
+  analogWrite(l2BLUE, 0);
+  }else
+  {
+  Serial.println("do nothing with humidity");
+  analogWrite(l2RED, 0);
+  analogWrite(l2GREEN, 0);
+  analogWrite(l2BLUE, 0);
+  }
+  server.send(204,"humidity");
+}
+void handleLight()
+{
+  String data = server.arg("plain");
+  StaticJsonBuffer<200> jBuffer;
+  JsonObject& jObject = jBuffer.parseObject(data);
+  String msg = jObject["action"];
+  Serial.println(msg);
+    if(msg.equals("increase")){
+  Serial.println("increase light");
+  analogWrite(l3RED, 200);
+  analogWrite(l3GREEN, 0);
+  analogWrite(l3BLUE, 0);
+  }
+  else if(msg.equals("decrease")){
+  Serial.println("decrease light");
+  analogWrite(l3RED, 0);
+  analogWrite(l3GREEN, 200);
+  analogWrite(l3BLUE, 0);
+  }else
+  {
+  Serial.print("do nothing with light");
+  analogWrite(l3RED, 0);
+  analogWrite(l3GREEN, 0);
+  analogWrite(l3BLUE, 0);
+  }
+  server.send(204,"light");
+}
