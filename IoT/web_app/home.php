@@ -141,7 +141,7 @@
 	  </tr>
       <tr align="center">
           <td style="padding: 30px 50px 0px 0px">Humidity [%]</td>
-          <td style="padding: 30px 10px 0px 50px"><?php echo $current_humidity; ?></td>
+           <td style="padding: 30px 10px 0px 50px"><p data-color2="<?php echo $current_humidity; ?>" ><?php echo $current_humidity; ?></p></td>
 	  </tr>
       <tr align="center">
           <td style="padding: 30px 50px 0px 0px">Pressure [hPa]</td>
@@ -162,13 +162,23 @@
 <script>
 $(document).ready(function(){
 
-  var mc = {
-    '0-2'     : 'green',
-    '3-5'    : 'yellow',
+  var mc_uv = {
+    '0-2'   : 'green',
+    '3-5'   : 'yellow',
     '6-7'   : 'orange',
     '8-10'  : 'red',
     '11-20' : 'purple'
   };
+
+  var mc_humi = {
+    '0-20'   : 'red',
+    '21-30'  : 'orange',
+    '31-40'  : 'yellow',
+    '41-50'  : 'green',
+    '51-70'  : 'yellow',
+    '71-80'  : 'orange',
+    '81-100' : 'red'
+  }; 
 
 function between(x, min, max) {
   return x >= min && x <= max;
@@ -176,7 +186,8 @@ function between(x, min, max) {
 
 
 
-  var dc;
+  var dc_uv;
+  var dc_humi;
   var first;
   var second;
   var th;
@@ -185,28 +196,44 @@ function between(x, min, max) {
 
     th = $(this);
 
-    dc = parseInt($(this).attr('data-color'),10);
+    dc_uv = parseInt($(this).attr('data-color'),10);
+    dc_humi = parseInt($(this).attr('data-color2'),10);
 
-
-      $.each(mc, function(name, value){
+      $.each(mc_uv, function(name, value){
 
 
         first = parseInt(name.split('-')[0],10);
         second = parseInt(name.split('-')[1],10);
 
-        console.log(between(dc, first, second));
+        console.log(between(dc_uv, first, second));
 
-        if( between(dc, first, second) ){
+        if( between(dc_uv, first, second) ){
           th.addClass(value);
         }
-
-
-
       });
+
+      $.each(mc_humi, function(name, value){
+
+
+        first = parseInt(name.split('-')[0],10);
+        second = parseInt(name.split('-')[1],10);
+
+        console.log(between(dc_humi, first, second));
+
+        if( between(dc_humi, first, second) ){
+          th.addClass(value);
+        }
+      });
+
 
   });
 });
 </script>
+
 <script src="./script.js"></script>
 </body>
 </html>
+
+
+
+
